@@ -25,6 +25,7 @@ import {
   ViewStyle,
   NativeEventSubscription,
   EmitterSubscription,
+  useWindowDimensions,
 } from 'react-native';
 import {
   PanGestureHandler,
@@ -136,9 +137,11 @@ const ModalizeBase = (
     onOverlayPress,
     onLayout,
   }: IProps,
-  ref: React.Ref<React.ReactNode>,
+  ref,
 ): JSX.Element | null => {
-  const { height: screenHeight } = useDimensions();
+  const { height: windowDefaultHeight } = useWindowDimensions();
+  const { height } = useDimensions();
+  const screenHeight = height || windowDefaultHeight;
   const isHandleOutside = handlePosition === 'outside';
   const handleHeight = withHandle ? 20 : isHandleOutside ? 35 : 20;
   const fullHeight = screenHeight - modalTopOffset;
@@ -168,8 +171,9 @@ const ModalizeBase = (
   const beginScrollY = React.useRef(new Animated.Value(0)).current;
   const dragY = React.useRef(new Animated.Value(0)).current;
   const translateY = React.useRef(new Animated.Value(screenHeight)).current;
-  const reverseBeginScrollY = React.useRef(Animated.multiply(new Animated.Value(-1), beginScrollY))
-    .current;
+  const reverseBeginScrollY = React.useRef(
+    Animated.multiply(new Animated.Value(-1), beginScrollY),
+  ).current;
 
   const tapGestureModalizeRef = React.useRef<TapGestureHandler>(null);
   const panGestureChildrenRef = React.useRef<PanGestureHandler>(null);
@@ -225,6 +229,8 @@ const ModalizeBase = (
     alwaysOpenValue: number | undefined,
     dest: TOpen = 'default',
   ): void => {
+    //DragY is being reset somewhere- causes modal to jump around. Workaround is to set it again at the start of handleAnimateOpen
+    dragY.setValue(0);
     const { timing, spring } = openAnimationConfig;
 
     (backButtonListenerRef as any).current = BackHandler.addEventListener(
@@ -346,7 +352,10 @@ const ModalizeBase = (
             toValue,
             useNativeDriver: USE_NATIVE_DRIVER,
           }),
-    ]).start(() => {
+    ]).start(({ finished }) => {
+      if (!finished) {
+        return;
+      }
       if (onClosed) {
         onClosed();
       }
@@ -498,8 +507,8 @@ const ModalizeBase = (
       isAndroid
         ? false
         : alwaysOpen
-        ? beginScrollYValue > 0 || translationY < 0
-        : enableBouncesValue,
+          ? beginScrollYValue > 0 || translationY < 0
+          : enableBouncesValue,
     );
 
     if (nativeEvent.oldState === State.ACTIVE) {
@@ -621,7 +630,7 @@ const ModalizeBase = (
         onOverlayPress();
       }
 
-      const dest = !!alwaysOpen ? 'alwaysOpen' : 'default';
+      const dest = alwaysOpen ? 'alwaysOpen' : 'default';
 
       handleClose(dest);
     }
@@ -677,8 +686,8 @@ const ModalizeBase = (
     );
   };
 
-  const renderElement = (Element: React.ReactNode): JSX.Element =>
-    typeof Element === 'function' ? Element() : Element;
+  //@ts-ignore
+  const renderElement = (Element: React.ReactNode): JSX.Element => typeof Element === 'function' ? Element() : Element;
 
   const renderComponent = (
     component: React.ReactNode,
@@ -723,7 +732,7 @@ const ModalizeBase = (
   const renderContent = (): JSX.Element => {
     const keyboardDismissMode:
       | Animated.Value
-      | Animated.AnimatedInterpolation
+      | Animated.AnimatedInterpolation<0>
       | 'interactive'
       | 'on-drag' = isIos ? 'interactive' : 'on-drag';
     const passedOnProps = flatListProps ?? sectionListProps ?? scrollViewProps;
@@ -908,13 +917,8 @@ const ModalizeBase = (
       backButtonListenerRef.current?.remove();
       beginScrollY.removeListener(beginScrollYListener);
 
-      if (isBelowRN65) {
-        Keyboard.removeListener('keyboardDidShow', handleKeyboardShow);
-        Keyboard.removeListener('keyboardDidHide', handleKeyboardHide);
-      } else {
         keyboardShowListener?.remove();
         keyboardHideListener?.remove();
-      }
     };
   }, []);
 
@@ -1001,5 +1005,5 @@ const ModalizeBase = (
 export type ModalizeProps = IProps;
 export type Modalize = IHandles;
 
-export const Modalize = React.forwardRef(ModalizeBase);
+export const Modalize = React.forwardRef<IHandles>(ModalizeBase);
 export * from './utils/use-modalize';

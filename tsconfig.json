@@ -4,8 +4,8 @@
     "allowSyntheticDefaultImports": true,
     "declaration": true,
     "jsx": "react",
-    "lib": ["es2017", "dom"],
-    "target": "es2015",
+    "lib": ["esnext", "dom"],
+    "target": "esnext",
     "module": "commonjs",
     "moduleResolution": "node",
     "noEmitOnError": true,
@@ -18,7 +18,6 @@
     "sourceMap": false,
     "strictPropertyInitialization": false,
     "noUnusedLocals": true,
-    "suppressImplicitAnyIndexErrors": true,
     "noUnusedParameters": true
   },
   "include": ["src"]

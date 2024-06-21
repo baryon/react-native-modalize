@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.2] - 2024-06-21
+
+### Upgrade packages and patch
+
+
 ## [2.1.1] - 2022-08-10
 
 ### 👀 Bug Fixes

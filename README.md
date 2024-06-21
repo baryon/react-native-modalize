@@ -23,7 +23,7 @@ This component comes with a ScrollView, the default renderer, a FlatList or a Se
 ## Installation
 
 ```bash
-yarn add react-native-modalize react-native-gesture-handler
+yarn add github:baryon/react-native-modalize react-native-gesture-handler
 ```
 
 <details>
@@ -37,15 +37,6 @@ npx pod-install ios
 
 <details>
   <summary>Android</summary>
-
-#### React Native <= 0.59
-
-Follow [this guide](https://jeremybarbet.github.io/react-native-modalize/#/INSTALLATION) to complete the Android installation.
-
-#### React Native > 0.60
-
-You don't need to follow the guide mentioned above because autolinking from React already did the steps.
-
 </details>
 
 ## Usage

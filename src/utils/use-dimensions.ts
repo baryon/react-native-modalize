@@ -7,7 +7,14 @@ export const useDimensions = (): ScaledSize => {
   const [dimensions, setDimensions] = React.useState(Dimensions.get('window'));
 
   const onChange = ({ window }: { window: ScaledSize }): void => {
-    setDimensions(window);
+    if (
+      dimensions.width !== window.width ||
+      dimensions.height !== window.height ||
+      dimensions.scale !== window.scale ||
+      dimensions.fontScale !== window.fontScale
+    ) {
+      setDimensions(window);
+    }
   };
 
   React.useEffect(() => {
@@ -20,11 +27,7 @@ export const useDimensions = (): ScaledSize => {
     }
 
     return () => {
-      if (isBelowRN65) {
-        Dimensions.removeEventListener('change', onChange);
-      } else {
         dimensionChangeListener?.remove();
-      }
     };
   }, []);
 
