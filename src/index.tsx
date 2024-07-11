@@ -1005,5 +1005,6 @@ const ModalizeBase = (
 export type ModalizeProps = IProps;
 export type Modalize = IHandles;
 
-export const Modalize = React.forwardRef<IHandles>(ModalizeBase);
+export const Modalize = React.forwardRef<IHandles & IProps>(ModalizeBase);
+
 export * from './utils/use-modalize';
